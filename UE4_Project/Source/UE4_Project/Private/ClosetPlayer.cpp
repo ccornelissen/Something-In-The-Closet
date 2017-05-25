@@ -2,7 +2,7 @@
 
 #include "UE4_Project.h"
 #include "ClosetPlayer.h"
-
+#include "InteractableComponent.h"
 
 // Sets default values
 AClosetPlayer::AClosetPlayer()
@@ -30,6 +30,56 @@ void AClosetPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	HighlightHit(GetTrace());
+}
+
+void AClosetPlayer::HighlightHit(FHitResult LineTraceHit)
+{
+	if (LineTraceHit.Actor != nullptr)
+	{
+		//Get the UUserhighlight component from the actor
+		UInteractableComponent* HighlightActor = LineTraceHit.Actor->FindComponentByClass<UInteractableComponent>();
+
+		UE_LOG(LogTemp, Warning, TEXT("Found Actor!!!"));
+
+		//Check to make sure the actor has the component
+		if (HighlightActor != nullptr)
+		{
+			//Turning on the post process
+			HighlightActor->Touched();
+
+			UE_LOG(LogTemp, Warning, TEXT("TOUCHING!!!"));
+		}
+	}
+}
+
+const FHitResult AClosetPlayer::GetTrace()
+{
+	//Get where the player is looking
+	FVector PlayerLoc;
+	FRotator PlayerRot;
+
+	GetController()->GetPlayerViewPoint(PlayerLoc, PlayerRot);
+
+	//Calculate how far they can reach based off where they're looking
+	FVector LineTraceEnd = PlayerLoc + (PlayerRot.Vector() * fPlayerReach);
+
+	FHitResult LineTraceHit;
+
+	//Set up query params
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+	//Perform the line trace
+	GetWorld()->LineTraceSingleByObjectType
+		(
+			LineTraceHit,
+			PlayerLoc,
+			LineTraceEnd,
+			FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+			TraceParams
+		);
+
+	return LineTraceHit;
 }
 
 // Called to bind functionality to input
@@ -80,4 +130,6 @@ void AClosetPlayer::LookUpAtRate(float Rate)
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
+
+
 

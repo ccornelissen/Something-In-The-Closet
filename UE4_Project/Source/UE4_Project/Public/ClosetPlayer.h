@@ -25,6 +25,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate;
 
+	//How far away the player can be from an object before they get the option to interact
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	float fPlayerReach = 75.0f;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -39,12 +49,10 @@ protected:
 	void LookUpAtRate(float Rate);
 
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+private:
+	const FHitResult GetTrace();
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void HighlightHit(FHitResult LineTraceHit);
 
 	
 	
