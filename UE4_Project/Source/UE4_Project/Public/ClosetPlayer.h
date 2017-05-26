@@ -54,6 +54,6 @@ private:
 
 	void HighlightHit(FHitResult LineTraceHit);
 
-	
-	
+	void Interact();
+
 };

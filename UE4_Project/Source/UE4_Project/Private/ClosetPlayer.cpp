@@ -37,20 +37,35 @@ void AClosetPlayer::HighlightHit(FHitResult LineTraceHit)
 {
 	if (LineTraceHit.Actor != nullptr)
 	{
-		//Get the UUserhighlight component from the actor
+		//Get the Interactable component from the actor
 		UInteractableComponent* HighlightActor = LineTraceHit.Actor->FindComponentByClass<UInteractableComponent>();
-
-		UE_LOG(LogTemp, Warning, TEXT("Found Actor!!!"));
 
 		//Check to make sure the actor has the component
 		if (HighlightActor != nullptr)
 		{
 			//Turning on the post process
-			HighlightActor->Touched();
-
-			UE_LOG(LogTemp, Warning, TEXT("TOUCHING!!!"));
+			HighlightActor->Viewed();
 		}
 	}
+}
+
+void AClosetPlayer::Interact()
+{
+	FHitResult LineTraceHit = GetTrace();
+
+	if (LineTraceHit.Actor != nullptr)
+	{
+		//Get the Interactable component from the actor
+		UInteractableComponent* InteractActor = LineTraceHit.Actor->FindComponentByClass<UInteractableComponent>();
+
+		//Check to make sure the actor has the component
+		if (InteractActor != nullptr)
+		{
+			//trigger the interaction
+			InteractActor->Touched();
+		}
+	}
+
 }
 
 const FHitResult AClosetPlayer::GetTrace()
@@ -90,8 +105,9 @@ void AClosetPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AClosetPlayer::Interact);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AClosetPlayer::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AClosetPlayer::MoveRight);

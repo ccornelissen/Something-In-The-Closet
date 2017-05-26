@@ -43,18 +43,21 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 }
 
-void UInteractableComponent::Touched()
+void UInteractableComponent::Viewed()
 {
 	if (ActorMesh == nullptr)
 	{
 		return;
 	}
 
-	WasTouched.Broadcast();
-
 	//Turning on the highlight
 	ActorMesh->SetRenderCustomDepth(true);
 
 	//Set the revert timer to current time
 	fMaterialRevertTimer = GetWorld()->GetTimeSeconds();
+}
+
+void UInteractableComponent::Touched()
+{
+	WasTouched.Broadcast();
 }

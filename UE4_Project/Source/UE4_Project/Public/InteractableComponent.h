@@ -25,6 +25,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	//Function used to turn on custom depth to show outline
+	void Viewed();
+
 	void Touched();
 
 	UPROPERTY(BlueprintAssignable)
