@@ -2,6 +2,7 @@
 
 #include "UE4_Project.h"
 #include "InteractableComponent.h"
+#include "ClosetPlayer.h"
 
 
 // Sets default values for this component's properties
@@ -57,7 +58,12 @@ void UInteractableComponent::Viewed()
 	fMaterialRevertTimer = GetWorld()->GetTimeSeconds();
 }
 
-void UInteractableComponent::Touched()
+void UInteractableComponent::Touched(AClosetPlayer* Player)
 {
+	if (Player != nullptr)
+	{
+		CurrentPlayer = Player;
+	}
+
 	WasTouched.Broadcast();
 }

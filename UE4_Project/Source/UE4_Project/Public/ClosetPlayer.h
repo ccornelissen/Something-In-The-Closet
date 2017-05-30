@@ -5,6 +5,15 @@
 #include "GameFramework/Character.h"
 #include "ClosetPlayer.generated.h"
 
+UENUM()
+enum class EPlayerState : uint8
+{
+	CP_Wandering,
+	CP_InBedSafe,
+	CP_InBedPeeking,
+	CP_Cinematic
+};
+
 UCLASS()
 class UE4_PROJECT_API AClosetPlayer : public ACharacter
 {
@@ -18,11 +27,11 @@ public:
 	AClosetPlayer();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	float BaseLookUpRate;
 
 	//How far away the player can be from an object before they get the option to interact
@@ -34,6 +43,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(VisibleAnywhere, Category = "Player")
+	EPlayerState CurrentPlayerState = EPlayerState::CP_Wandering;
 
 protected:
 	// Called when the game starts or when spawned

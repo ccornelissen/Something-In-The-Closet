@@ -5,6 +5,8 @@
 #include "Components/ActorComponent.h"
 #include "InteractableComponent.generated.h"
 
+class AClosetPlayer;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTouchDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -27,7 +29,10 @@ public:
 	//Function used to turn on custom depth to show outline
 	void Viewed();
 
-	void Touched();
+	void Touched(AClosetPlayer* Player);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	AClosetPlayer* CurrentPlayer = nullptr;
 
 	UPROPERTY(BlueprintAssignable)
 	FTouchDelegate WasTouched; //Event to tell the door to open

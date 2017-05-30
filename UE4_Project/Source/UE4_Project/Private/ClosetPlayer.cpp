@@ -51,6 +51,11 @@ void AClosetPlayer::HighlightHit(FHitResult LineTraceHit)
 
 void AClosetPlayer::Interact()
 {
+	if (CurrentPlayerState == EPlayerState::CP_InBedSafe || CurrentPlayerState == EPlayerState::CP_InBedPeeking)
+	{
+		CurrentPlayerState = EPlayerState::CP_Wandering;
+	}
+
 	FHitResult LineTraceHit = GetTrace();
 
 	if (LineTraceHit.Actor != nullptr)
@@ -62,7 +67,7 @@ void AClosetPlayer::Interact()
 		if (InteractActor != nullptr)
 		{
 			//trigger the interaction
-			InteractActor->Touched();
+			InteractActor->Touched(this);
 		}
 	}
 
@@ -109,6 +114,7 @@ void AClosetPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AClosetPlayer::Interact);
 
+	
 	PlayerInputComponent->BindAxis("MoveForward", this, &AClosetPlayer::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AClosetPlayer::MoveRight);
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
@@ -119,7 +125,7 @@ void AClosetPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AClosetPlayer::MoveForward(float Value)
 {
-	if (Value != 0.0f)
+	if (Value != 0.0f && CurrentPlayerState == EPlayerState::CP_Wandering)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), Value);
@@ -128,7 +134,7 @@ void AClosetPlayer::MoveForward(float Value)
 
 void AClosetPlayer::MoveRight(float Value)
 {
-	if (Value != 0.0f)
+	if (Value != 0.0f && CurrentPlayerState == EPlayerState::CP_Wandering)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), Value);
