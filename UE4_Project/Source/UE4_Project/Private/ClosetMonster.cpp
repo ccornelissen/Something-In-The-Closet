@@ -16,7 +16,8 @@ AClosetMonster::AClosetMonster()
 void AClosetMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SpawnLocation = GetActorLocation();
 }
 
 // Called every frame

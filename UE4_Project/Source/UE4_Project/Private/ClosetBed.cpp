@@ -12,7 +12,7 @@ AClosetBed::AClosetBed()
 	PrimaryActorTick.bCanEverTick = true;
 
 	BedMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BedMesh"));
-	BedMesh->SetupAttachment(GetRootComponent());
+	SetRootComponent(BedMesh);
 }
 
 void AClosetBed::EnterBed(AClosetPlayer* Player)
@@ -21,14 +21,7 @@ void AClosetBed::EnterBed(AClosetPlayer* Player)
 
 	FVector PlayerLoc = Player->GetActorLocation();
 
-	//while (PlayerLoc != PlayerBedLoc)
-	//{
-		//FVector NewLoc = FMath::Lerp(PlayerLoc, PlayerBedLoc, fEnterBedSpeed);
-
 	Player->SetActorLocation(PlayerBedLoc);
-
-		//PlayerLoc = Player->GetActorLocation();
-	//}
 }
 
 

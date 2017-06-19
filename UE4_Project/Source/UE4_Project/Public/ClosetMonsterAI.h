@@ -13,7 +13,9 @@ class UE4_PROJECT_API AClosetMonsterAI : public AAIController
 {
 	GENERATED_BODY()
 	
-	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Monster Pawn")
+	FVector GetSpawnLocation();
 	
 	
 };

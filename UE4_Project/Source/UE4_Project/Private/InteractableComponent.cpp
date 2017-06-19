@@ -1,8 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UE4_Project.h"
-#include "InteractableComponent.h"
+#include "MonsterSpawner.h"
 #include "ClosetPlayer.h"
+#include "InteractableComponent.h"
+
 
 
 // Sets default values for this component's properties
@@ -58,6 +60,7 @@ void UInteractableComponent::Viewed()
 	fMaterialRevertTimer = GetWorld()->GetTimeSeconds();
 }
 
+//User to relay player interaction into a blueprint event
 void UInteractableComponent::Touched(AClosetPlayer* Player)
 {
 	if (Player != nullptr)
@@ -66,4 +69,13 @@ void UInteractableComponent::Touched(AClosetPlayer* Player)
 	}
 
 	WasTouched.Broadcast();
+}
+
+//Used to spawn the monster
+void UInteractableComponent::InitiateMonsterSpawn()
+{
+	if (MonsterSpawner != nullptr)
+	{
+		MonsterSpawner->SpawnMonster();
+	}
 }

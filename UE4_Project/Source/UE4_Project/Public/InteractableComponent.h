@@ -6,6 +6,7 @@
 #include "InteractableComponent.generated.h"
 
 class AClosetPlayer;
+class AMonsterSpawner;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTouchDelegate);
 
@@ -36,6 +37,14 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FTouchDelegate WasTouched; //Event to tell the door to open
+
+	//Function called to spawn the monster if this object causes the monster to appear.
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void InitiateMonsterSpawn();
+
+	//Reference to in world monster spawner
+	UPROPERTY(EditAnywhere, Category = "Gameplay")
+	AMonsterSpawner* MonsterSpawner;
 
 private:
 	//Reference to the highlight actor
