@@ -7,7 +7,7 @@
 
 FVector AClosetMonsterAI::GetSpawnLocation()
 {
-	AClosetMonster* ControlledMonster = Cast<AClosetMonster>(GetControlledPawn());
+	AClosetMonster* ControlledMonster = Cast<AClosetMonster>(GetPawn());
 
 	if (ControlledMonster != nullptr)
 	{
