@@ -2,6 +2,7 @@
 
 #include "UE4_Project.h"
 #include "ClosetMonster.h"
+#include "ClosetPlayer.h"
 #include "MonsterSpawner.h"
 
 
@@ -27,9 +28,10 @@ void AMonsterSpawner::SpawnMonster()
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-			// spawn the projectile at the muzzle
-			World->SpawnActor<AClosetMonster>(MonsterToSpawn, SpawnLocation, SpawnRot, ActorSpawnParams);
+			AClosetPlayer* Player = Cast<AClosetPlayer>(World->GetFirstPlayerController()->GetPawn());
 
+			// spawn the projectile at the muzzle
+			Player->CurMonster = World->SpawnActor<AClosetMonster>(MonsterToSpawn, SpawnLocation, SpawnRot, ActorSpawnParams);
 		}
 	}
 }

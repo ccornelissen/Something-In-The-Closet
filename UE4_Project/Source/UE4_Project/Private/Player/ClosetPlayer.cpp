@@ -1,8 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UE4_Project.h"
+#include "Interactable/InteractableComponent.h"
+#include "PlayerUI.h"
+#include "ClosetMonster.h"
 #include "ClosetPlayer.h"
-#include "InteractableComponent.h"
 
 // Sets default values
 AClosetPlayer::AClosetPlayer()
@@ -25,12 +27,16 @@ void AClosetPlayer::BeginPlay()
 	
 }
 
+
+
 // Called every frame
 void AClosetPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	HighlightHit(GetTrace());
+
+	GetDistanceFromMonster();
 }
 
 void AClosetPlayer::HighlightHit(FHitResult LineTraceHit)
@@ -45,6 +51,25 @@ void AClosetPlayer::HighlightHit(FHitResult LineTraceHit)
 		{
 			//Turning on the post process
 			HighlightActor->Viewed();
+		}
+	}
+}
+
+void AClosetPlayer::GetDistanceFromMonster()
+{
+	if (CurMonster != nullptr)
+	{
+		FVector MonsterPos = CurMonster->GetActorLocation();
+		FVector PlayerPos = GetActorLocation();
+
+		float fDis = FVector::Dist(MonsterPos, PlayerPos);
+
+		//Calculate the number so that the closer we get the higher number it will return
+		fDis = 1.0f - (fDis / 1000);
+
+		if (PlayerUI != nullptr)
+		{
+			PlayerUI->DistanceFromMonster = fDis;
 		}
 	}
 }
@@ -113,6 +138,7 @@ void AClosetPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AClosetPlayer::Interact);
+	PlayerInputComponent->BindAction("Cancel", IE_Pressed, this, &AClosetPlayer::Cancel).bExecuteWhenPaused = true;
 
 	
 	PlayerInputComponent->BindAxis("MoveForward", this, &AClosetPlayer::MoveForward);
@@ -153,5 +179,22 @@ void AClosetPlayer::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AClosetPlayer::Cancel()
+{
+	if (CurrentPlayerState == EPlayerState::CP_LookingAtObject)
+	{
+		//Return if there is no player UI
+		if (PlayerUI != nullptr)
+		{
+			PlayerUI->CloseImage();
+
+			CurrentPlayerState = EPlayerState::CP_Wandering;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("No Player UI Present!"));
+		}
+	}
+}
 
 

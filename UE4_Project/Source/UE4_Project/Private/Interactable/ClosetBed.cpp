@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UE4_Project.h"
+#include "Player/ClosetPlayer.h"
 #include "ClosetBed.h"
-#include "ClosetPlayer.h"
+
 
 
 // Sets default values

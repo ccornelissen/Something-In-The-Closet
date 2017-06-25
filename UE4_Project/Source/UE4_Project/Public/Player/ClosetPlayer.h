@@ -11,8 +11,13 @@ enum class EPlayerState : uint8
 	CP_Wandering,
 	CP_InBedSafe,
 	CP_InBedPeeking,
+	CP_LookingAtObject,
+	CP_Paused,
 	CP_Cinematic
 };
+
+class UPlayerUI;
+class AClosetMonster;
 
 UCLASS()
 class UE4_PROJECT_API AClosetPlayer : public ACharacter
@@ -38,6 +43,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	float fPlayerReach = 75.0f;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Player")
+	UPlayerUI* PlayerUI;
+
+	AClosetMonster* CurMonster;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -50,6 +60,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	void Cancel();
 
 	/** Player Movement Functions */
 	void MoveForward(float Val);
@@ -65,6 +77,9 @@ private:
 	const FHitResult GetTrace();
 
 	void HighlightHit(FHitResult LineTraceHit);
+
+	//Calculates distance between monster and player for HUD warning
+	void GetDistanceFromMonster();
 
 	void Interact();
 

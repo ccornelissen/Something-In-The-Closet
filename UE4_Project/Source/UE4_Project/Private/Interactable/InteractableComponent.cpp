@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UE4_Project.h"
-#include "MonsterSpawner.h"
-#include "ClosetPlayer.h"
+#include "Monster/MonsterSpawner.h"
+#include "Player/ClosetPlayer.h"
 #include "InteractableComponent.h"
 
 
