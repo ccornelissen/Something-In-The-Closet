@@ -18,6 +18,7 @@ enum class EPlayerState : uint8
 
 class UPlayerUI;
 class AClosetMonster;
+class UInteractableComponent;
 
 UCLASS()
 class UE4_PROJECT_API AClosetPlayer : public ACharacter
@@ -31,13 +32,13 @@ public:
 	// Sets default values for this character's properties
 	AClosetPlayer();
 
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseTurnRate;
+	/** Control turning sensitivity */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
+	float BaseTurnRate = 100.0f;
 
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseLookUpRate;
+	/** Control Mouse Y Sensitivity */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
+	float BaseLookUpRate = 100.0f;
 
 	//How far away the player can be from an object before they get the option to interact
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
@@ -54,8 +55,17 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player")
 	EPlayerState CurrentPlayerState = EPlayerState::CP_Wandering;
+
+	//In Radians
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	float fCamMinPitch = -50.0f;
+	//In Radians
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	float fCamMaxPitch = 50.0f;
+
+	FRotator PlayerStartRot;
 
 protected:
 	// Called when the game starts or when spawned
@@ -74,13 +84,14 @@ protected:
 
 
 private:
-	const FHitResult GetTrace();
-
-	void HighlightHit(FHitResult LineTraceHit);
+	//Functions that allow player to interact with objects
+	const FHitResult GetTrace(); //See if player is looking at object
+	void HighlightHit(FHitResult LineTraceHit); //Highlight if object is interactable
+	void Interact(); //Call interact blueprint if player clicks on object
 
 	//Calculates distance between monster and player for HUD warning
 	void GetDistanceFromMonster();
 
-	void Interact();
-
+	//Storing the last interacted actor
+	UInteractableComponent* LastInteractActor = nullptr;
 };

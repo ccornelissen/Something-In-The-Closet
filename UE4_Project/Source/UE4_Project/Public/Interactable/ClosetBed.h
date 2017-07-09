@@ -22,8 +22,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void EnterBed(AClosetPlayer* Player);
 
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void LeaveBed(AClosetPlayer* Player);
+
 	UPROPERTY(BlueprintReadWrite, Category = "Gameplay")
-	FVector PlayerBedLoc;
+	FTransform PlayerBedLoc;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Gameplay")
+	FTransform PlayerBedExitLoc;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
 	float fEnterBedSpeed = 0.5f;

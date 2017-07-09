@@ -71,6 +71,16 @@ void UInteractableComponent::Touched(AClosetPlayer* Player)
 	WasTouched.Broadcast();
 }
 
+void UInteractableComponent::Untouched(AClosetPlayer * Player)
+{
+	if (Player != nullptr)
+	{
+		CurrentPlayer = Player;
+	}
+
+	WasUntouched.Broadcast();
+}
+
 //Used to spawn the monster
 void UInteractableComponent::InitiateMonsterSpawn()
 {

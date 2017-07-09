@@ -16,7 +16,7 @@ AClosetPlayer::AClosetPlayer()
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->RelativeLocation = FVector(40.0f, 1.75f, 64.f); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	FirstPersonCameraComponent->bUsePawnControlRotation = false;
 
 }
 
@@ -24,10 +24,10 @@ AClosetPlayer::AClosetPlayer()
 void AClosetPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PlayerStartRot = GetActorRotation();
 	
 }
-
-
 
 // Called every frame
 void AClosetPlayer::Tick(float DeltaTime)
@@ -76,12 +76,14 @@ void AClosetPlayer::GetDistanceFromMonster()
 
 void AClosetPlayer::Interact()
 {
-	if (CurrentPlayerState == EPlayerState::CP_InBedSafe || CurrentPlayerState == EPlayerState::CP_InBedPeeking)
-	{
-		CurrentPlayerState = EPlayerState::CP_Wandering;
-	}
-
 	FHitResult LineTraceHit = GetTrace();
+
+	if (LastInteractActor != nullptr)
+	{
+		LastInteractActor->Untouched(this);
+		LastInteractActor = nullptr;
+		return;
+	}
 
 	if (LineTraceHit.Actor != nullptr)
 	{
@@ -91,6 +93,7 @@ void AClosetPlayer::Interact()
 		//Check to make sure the actor has the component
 		if (InteractActor != nullptr)
 		{
+			LastInteractActor = InteractActor;
 			//trigger the interaction
 			InteractActor->Touched(this);
 		}
@@ -137,15 +140,13 @@ void AClosetPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AClosetPlayer::Interact);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AClosetPlayer::Interact).bExecuteWhenPaused = true;
 	PlayerInputComponent->BindAction("Cancel", IE_Pressed, this, &AClosetPlayer::Cancel).bExecuteWhenPaused = true;
 
 	
 	PlayerInputComponent->BindAxis("MoveForward", this, &AClosetPlayer::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AClosetPlayer::MoveRight);
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &AClosetPlayer::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AClosetPlayer::LookUpAtRate);
 }
 
@@ -170,13 +171,23 @@ void AClosetPlayer::MoveRight(float Value)
 void AClosetPlayer::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	FRotator StartRot = GetActorRotation();
+	float YawToSet = StartRot.Yaw + (Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+
+	FRotator RotToSet = FRotator(StartRot.Pitch, YawToSet, StartRot.Roll);
+
+	SetActorRotation(RotToSet);
 }
 
 void AClosetPlayer::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	FRotator StartRot = FirstPersonCameraComponent->GetComponentRotation();
+	float PitchToSet = FMath::Clamp(StartRot.Pitch + (Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds()), fCamMinPitch, fCamMaxPitch);
+
+	FRotator RotToSet = FRotator(PitchToSet, StartRot.Yaw, StartRot.Roll);
+
+	FirstPersonCameraComponent->SetWorldRotation(RotToSet, false);
 }
 
 void AClosetPlayer::Cancel()

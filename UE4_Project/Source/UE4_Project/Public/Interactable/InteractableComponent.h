@@ -32,11 +32,16 @@ public:
 
 	void Touched(AClosetPlayer* Player);
 
+	void Untouched(AClosetPlayer* Player);
+
 	UPROPERTY(BlueprintReadOnly, Category = "Player")
 	AClosetPlayer* CurrentPlayer = nullptr;
 
 	UPROPERTY(BlueprintAssignable)
-	FTouchDelegate WasTouched; //Event to tell the door to open
+	FTouchDelegate WasTouched; //Event to tell if the object is touched
+
+	UPROPERTY(BlueprintAssignable)
+	FTouchDelegate WasUntouched; //Event called when player is trying to stop interacting with the object
 
 	//Function called to spawn the monster if this object causes the monster to appear.
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")

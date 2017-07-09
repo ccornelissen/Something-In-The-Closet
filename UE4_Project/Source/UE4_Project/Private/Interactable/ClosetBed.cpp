@@ -18,11 +18,26 @@ AClosetBed::AClosetBed()
 
 void AClosetBed::EnterBed(AClosetPlayer* Player)
 {
-	Player->CurrentPlayerState = EPlayerState::CP_InBedSafe;
+	if (Player != nullptr)
+	{
+		Player->CurrentPlayerState = EPlayerState::CP_InBedSafe;
 
-	FVector PlayerLoc = Player->GetActorLocation();
+		FRotator RotToSet = FRotator(PlayerBedLoc.GetRotation().Rotator().Pitch, Player->GetActorRotation().Yaw, Player->GetActorRotation().Roll);
 
-	Player->SetActorLocation(PlayerBedLoc);
+		Player->SetActorLocation(PlayerBedLoc.GetLocation());
+		Player->SetActorRotation(RotToSet);
+	}
+}
+
+void AClosetBed::LeaveBed(AClosetPlayer * Player)
+{
+	if (Player != nullptr)
+	{
+		Player->CurrentPlayerState = EPlayerState::CP_Wandering;
+
+		Player->SetActorLocation(PlayerBedExitLoc.GetLocation());
+		Player->SetActorRotation(Player->PlayerStartRot);
+	}
 }
 
 
