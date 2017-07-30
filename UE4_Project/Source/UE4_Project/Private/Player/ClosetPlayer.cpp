@@ -20,6 +20,17 @@ AClosetPlayer::AClosetPlayer()
 
 }
 
+
+UStaticMeshComponent& AClosetPlayer::GetPlayerBedSheet()
+{
+	return *BedSheet;
+}
+
+UCameraComponent& AClosetPlayer::GetPlayerCamera()
+{
+	return *FirstPersonCameraComponent;
+}
+
 // Called when the game starts or when spawned
 void AClosetPlayer::BeginPlay()
 {
@@ -138,11 +149,10 @@ void AClosetPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
 
-	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AClosetPlayer::Interact).bExecuteWhenPaused = true;
 	PlayerInputComponent->BindAction("Cancel", IE_Pressed, this, &AClosetPlayer::Cancel).bExecuteWhenPaused = true;
-
+	PlayerInputComponent->BindAction("Shield", IE_Pressed, this, &AClosetPlayer::SheetShieldDown);
+	PlayerInputComponent->BindAction("Shield", IE_Released, this, &AClosetPlayer::SheetShieldUp);
 	
 	PlayerInputComponent->BindAxis("MoveForward", this, &AClosetPlayer::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AClosetPlayer::MoveRight);
@@ -170,13 +180,26 @@ void AClosetPlayer::MoveRight(float Value)
 
 void AClosetPlayer::TurnAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	FRotator StartRot = GetActorRotation();
-	float YawToSet = StartRot.Yaw + (Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	if (Rate != 0.0f && CurrentPlayerState == EPlayerState::CP_Wandering)
+	{
+		// calculate delta for this frame from the rate information
+		FRotator StartRot = GetActorRotation();
+		float YawToSet = StartRot.Yaw + (Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 
-	FRotator RotToSet = FRotator(StartRot.Pitch, YawToSet, StartRot.Roll);
+		FRotator RotToSet = FRotator(StartRot.Pitch, YawToSet, StartRot.Roll);
 
-	SetActorRotation(RotToSet);
+		SetActorRotation(RotToSet);
+	}
+	else if (Rate != 0.0f && (CurrentPlayerState == EPlayerState::CP_InBedPeeking || CurrentPlayerState == EPlayerState::CP_InBedSafe))
+	{
+		// calculate delta for this frame from the rate information
+		FRotator StartRot = FirstPersonCameraComponent->GetComponentRotation();
+		float YawToSet = FMath::Clamp(StartRot.Yaw + (Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds()), fCamMinYaw, fCamMaxYaw);
+
+		FRotator RotToSet = FRotator(StartRot.Pitch, YawToSet, StartRot.Roll);
+
+		FirstPersonCameraComponent->SetWorldRotation(RotToSet, false);
+	}
 }
 
 void AClosetPlayer::LookUpAtRate(float Rate)
@@ -188,6 +211,27 @@ void AClosetPlayer::LookUpAtRate(float Rate)
 	FRotator RotToSet = FRotator(PitchToSet, StartRot.Yaw, StartRot.Roll);
 
 	FirstPersonCameraComponent->SetWorldRotation(RotToSet, false);
+}
+
+void AClosetPlayer::SheetShieldDown()
+{
+	if (BedSheetStartLoc == FVector::ZeroVector)
+	{
+		BedSheetStartLoc = BedSheet->GetComponentLocation();
+	}
+
+	CurrentPlayerState = EPlayerState::CP_InBedPeeking;
+
+	FVector NewLoc = FVector(BedSheetStartLoc.X + fSheetDecent, BedSheetStartLoc.Y, BedSheetStartLoc.Z);
+
+	BedSheet->SetWorldLocation(NewLoc);
+}
+
+void AClosetPlayer::SheetShieldUp()
+{
+	BedSheet->SetWorldLocation(BedSheetStartLoc);
+
+	CurrentPlayerState = EPlayerState::CP_InBedSafe;
 }
 
 void AClosetPlayer::Cancel()

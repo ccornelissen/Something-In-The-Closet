@@ -19,6 +19,7 @@ enum class EPlayerState : uint8
 class UPlayerUI;
 class AClosetMonster;
 class UInteractableComponent;
+class UCameraComponent;
 
 UCLASS()
 class UE4_PROJECT_API AClosetPlayer : public ACharacter
@@ -26,7 +27,7 @@ class UE4_PROJECT_API AClosetPlayer : public ACharacter
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "First Person", meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FirstPersonCameraComponent = nullptr;
+	UCameraComponent* FirstPersonCameraComponent = nullptr;
 
 public:
 	// Sets default values for this character's properties
@@ -65,7 +66,22 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
 	float fCamMaxPitch = 50.0f;
 
+	//In Radians
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	float fCamMinYaw = -100.0f;
+	//In Radians
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	float fCamMaxYaw = 100.0f;
+
+	//How far the player moves the sheet done
+	UPROPERTY(EditDefaultsOnly, Category = "Bed")
+	float fSheetDecent = 70.0f;
+
 	FRotator PlayerStartRot;
+
+	//Getters 
+	UStaticMeshComponent& GetPlayerBedSheet();
+	UCameraComponent& GetPlayerCamera();
 
 protected:
 	// Called when the game starts or when spawned
@@ -82,6 +98,14 @@ protected:
 
 	void LookUpAtRate(float Rate);
 
+	void SheetShieldDown();
+
+	void SheetShieldUp();
+
+	UPROPERTY(BlueprintReadWrite, Category = "Bed")
+	UStaticMeshComponent* BedSheet = nullptr;
+
+	FVector BedSheetStartLoc;
 
 private:
 	//Functions that allow player to interact with objects

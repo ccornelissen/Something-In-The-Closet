@@ -22,10 +22,22 @@ void AClosetBed::EnterBed(AClosetPlayer* Player)
 	{
 		Player->CurrentPlayerState = EPlayerState::CP_InBedSafe;
 
-		FRotator RotToSet = FRotator(PlayerBedLoc.GetRotation().Rotator().Pitch, Player->GetActorRotation().Yaw, Player->GetActorRotation().Roll);
+		FRotator RotToSet = FRotator(90, 0, 0);
 
 		Player->SetActorLocation(PlayerBedLoc.GetLocation());
 		Player->SetActorRotation(RotToSet);
+
+		UStaticMeshComponent* BedSheet = &Player->GetPlayerBedSheet();
+
+		if (BedSheet != nullptr)
+		{
+			BedSheet->SetVisibility(true);
+			BedSheet->SetActive(true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Player does not have bed sheet set!"));
+		}
 	}
 }
 
@@ -37,6 +49,29 @@ void AClosetBed::LeaveBed(AClosetPlayer * Player)
 
 		Player->SetActorLocation(PlayerBedExitLoc.GetLocation());
 		Player->SetActorRotation(Player->PlayerStartRot);
+
+		UStaticMeshComponent* BedSheet = &Player->GetPlayerBedSheet();
+
+		if (BedSheet != nullptr)
+		{
+			BedSheet->SetVisibility(false);
+			BedSheet->SetActive(false);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Player does not have bed sheet set!"));
+		}
+
+		UCameraComponent* PlayerCam = &Player->GetPlayerCamera();
+
+		if (PlayerCam != nullptr)
+		{
+			PlayerCam->SetWorldRotation(FRotator::ZeroRotator);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Player does not have camera set!"));
+		}
 	}
 }
 
