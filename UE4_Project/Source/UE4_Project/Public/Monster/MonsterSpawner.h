@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "MonsterSpawner.generated.h"
 
+class UPatrolPointsComponent;
 UCLASS()
 class UE4_PROJECT_API AMonsterSpawner : public AActor
 {
@@ -17,10 +18,15 @@ public:
 	//Spawn the monster
 	void SpawnMonster();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Patrol Points")
+	UPatrolPointsComponent* PatrolComp;
+
 protected:
 	//Reference to the monster
 	UPROPERTY(EditDefaultsOnly, Category = Monster)
 	TSubclassOf<class AClosetMonster> MonsterToSpawn;
+
+
 
 	
 	

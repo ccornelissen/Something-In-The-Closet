@@ -88,4 +88,8 @@ void UInteractableComponent::InitiateMonsterSpawn()
 	{
 		MonsterSpawner->SpawnMonster();
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Monster Spawner Set!"));
+	}
 }

@@ -3,6 +3,7 @@
 #include "UE4_Project.h"
 #include "ClosetMonster.h"
 #include "ClosetPlayer.h"
+#include "PatrolPointsComponent.h"
 #include "MonsterSpawner.h"
 
 
@@ -12,6 +13,8 @@ AMonsterSpawner::AMonsterSpawner()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//Create patrol component
+	PatrolComp = CreateDefaultSubobject<UPatrolPointsComponent>(TEXT("Patrol Points"));
 }
 
 void AMonsterSpawner::SpawnMonster()
@@ -30,8 +33,20 @@ void AMonsterSpawner::SpawnMonster()
 
 			AClosetPlayer* Player = Cast<AClosetPlayer>(World->GetFirstPlayerController()->GetPawn());
 
-			// spawn the projectile at the muzzle
-			Player->CurMonster = World->SpawnActor<AClosetMonster>(MonsterToSpawn, SpawnLocation, SpawnRot, ActorSpawnParams);
+			// spawn the monster
+			if (MonsterToSpawn != nullptr)
+			{
+				AClosetMonster* SpawnedMonster = World->SpawnActor<AClosetMonster>(MonsterToSpawn, SpawnLocation, SpawnRot, ActorSpawnParams);
+				Player->CurMonster = SpawnedMonster;
+
+				//Pass housed patrol points to the spawned monster
+				SpawnedMonster->PatrolPoints = PatrolComp->PatrolPoints;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Monster spawner doesn't have a monster set to spawn!"));
+			}
+			
 		}
 	}
 }

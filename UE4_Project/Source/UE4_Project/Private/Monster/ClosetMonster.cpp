@@ -27,10 +27,3 @@ void AClosetMonster::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void AClosetMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
